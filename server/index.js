@@ -5,25 +5,8 @@ const cors = require("cors");
 
 const app = express();
 
-// CORS dinamico: en desarrollo sera http://localhost:5173 y en produccion
-// la URL de Vercel que definas en la variable CLIENTE_URL.
-const origenesPermitidos = [
-  "http://localhost:5173",
-  process.env.CLIENTE_URL,
-].filter(Boolean);
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Permite peticiones sin origen (Postman, curl) y los origenes permitidos.
-      if (!origin || origenesPermitidos.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error(`Origen no permitido por CORS: ${origin}`));
-    },
-    credentials: true,
-  })
-);
+// Habilitar CORS para permitir solicitudes desde cualquier origen (Vercel, Localhost, etc.)
+app.use(cors());
 app.use(express.json());
 
 // Datos en memoria (luego los cambias por una base de datos)
@@ -65,7 +48,8 @@ app.delete("/api/tareas/:id", (req, res) => {
   res.status(204).send();
 });
 
-const PORT = process.env.PORT || 3001;
+// En Render se asigna un puerto dinámico mediante process.env.PORT
+const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
   console.log(`API corriendo en el puerto ${PORT}`);
